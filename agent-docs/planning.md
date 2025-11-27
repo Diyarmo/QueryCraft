@@ -39,4 +39,4 @@
 5. `Done` – Add environment variable loading (`python-dotenv`) for secrets and DB config placeholders.
 6. `Done` – Run basic Django health check (`python manage.py check`) to confirm setup.
 7. `Done` – Configure `DATABASES` for Postgres using env-driven credentials (`NAME`, `USER`, `PASSWORD`, `HOST`, `PORT`).
-8. `Todo` – Add `.env.example` (and stub `.env`) capturing `SECRET_KEY`, DB values, and Ollama host referenced by settings.
+8. `Done` – Add `.env.example` (and stub `.env`) capturing `SECRET_KEY`, DB values, and Ollama host referenced by settings.

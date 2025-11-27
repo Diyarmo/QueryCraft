@@ -22,6 +22,7 @@ venv/
 # Docker / misc
 *.env
 *.env.*
+!.env.example
 *.db
 /postgres-data/
 /ollama-data/
