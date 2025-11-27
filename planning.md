@@ -32,9 +32,11 @@
 
 
 ## Backend Foundation Tasks
-1. `Todo` – Scaffold Django project (`django-admin startproject querycraft .`).
-2. `Todo` – Create primary Django app (e.g., `core`) for business logic.
-3. `Todo` – Register app and required third-party apps in `INSTALLED_APPS`.
-4. `Todo` – Configure base settings (time zone, language, static files, DRF defaults).
-5. `Todo` – Add environment variable loading (`python-dotenv`) for secrets and DB config placeholders.
-6. `Todo` – Run basic Django health check (`python manage.py check`) to confirm setup.
+1. `Done` – Scaffold Django project (`django-admin startproject querycraft .`).
+2. `Done` – Create primary Django app (e.g., `core`) for business logic.
+3. `Done` – Register app and required third-party apps in `INSTALLED_APPS`.
+4. `Done` – Configure base settings (time zone, language, static files, DRF defaults).
+5. `Done` – Add environment variable loading (`python-dotenv`) for secrets and DB config placeholders.
+6. `Done` – Run basic Django health check (`python manage.py check`) to confirm setup.
+7. `Todo` – Configure `DATABASES` for Postgres using env-driven credentials (`NAME`, `USER`, `PASSWORD`, `HOST`, `PORT`).
+8. `Todo` – Add `.env.example` (and stub `.env`) capturing `SECRET_KEY`, DB values, and Ollama host referenced by settings.

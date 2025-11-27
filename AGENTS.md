@@ -8,3 +8,4 @@
 6. Keep the implementation details like bash commands out of `planning.md`.
 7. All the assumptions are stored in `info.md`.
 8. If something was not clear and we needed an assumption to make decision, we write the assumption to `info.md`.
+9. Simplicity is prefered at each step. We don't add a requirement or dependecy until we really need it. We don't introduce complexity until the simple solution proves to be not suitable.
