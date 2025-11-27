@@ -52,7 +52,7 @@
 
 
 ## Agent Workflow Tasks
-1. `Todo` – Scaffold the LangGraph workflow structure (graph, nodes, edges) within the Django project.
+1. `Done` – Scaffold the LangGraph workflow structure (graph, nodes, edges) within the Django project.
 2. `Todo` – Implement the QuestionToSQL node that calls the Ollama `sqlcoder` model with schema-aware prompting.
 3. `Todo` – Implement the ValidateSQL node that enforces read-only rules and leverages the SQL helper for safety.
 4. `Todo` – Implement the ExecuteSQL node that runs validated queries via `execute_safe_sql` and captures metadata.
