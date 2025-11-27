@@ -52,13 +52,14 @@ Browser ⇄ Django Web (REST API, LangGraph Orchestrator) ⇄ Ollama LLM Service
 ### 5a. Repository Structure
 ```
 /
+├── agent-docs/    # Docs for agents (planning.md, task.md, design-doc.md)
 ├── querycraft/    # Django project settings
 ├── core/          # Primary app (models, LangGraph workflow, API, management commands)
 ├── frontend/      # Static HTML/JS assets for the UI
 ├── scripts/       # Helper or container entrypoint scripts
 ├── tests/         # Automated tests
 ├── docs/          # Supplemental docs (info.md, diagrams)
-└── root files     # manage.py, requirements.txt, README.md, planning.md, design-doc.md, agents.md, task.md, .env.example, Dockerfile, docker-compose.yml
+└── root files     # manage.py, requirements.txt, README.md, AGENTS.md, .env.example, Dockerfile, docker-compose.yml
 ```
 
 ### 6. Data Model
