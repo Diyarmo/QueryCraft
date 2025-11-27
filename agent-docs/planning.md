@@ -43,7 +43,7 @@
 
 
 ## Data Layer Tasks
-1. `Todo` – Define Django models for `Customer`, `Product`, `Order` with required fields, relationships, and metadata from the design doc.
+1. `Done` – Define Django models for `Customer`, `Product`, `Order` with required fields, relationships, and metadata from the design doc.
 2. `Todo` – Generate initial migrations for the data models (`python manage.py makemigrations core`).
 3. `Todo` – Apply migrations to the Postgres database (`python manage.py migrate`).
 4. `Todo` – Implement a read-only SQL execution helper/manager with safety checks (LIMIT enforcement, prohibited keywords).
