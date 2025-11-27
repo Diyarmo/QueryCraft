@@ -1,0 +1,16 @@
+services:
+  db:
+    container_name: querycraft-db
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-querycraft}
+      POSTGRES_USER: ${POSTGRES_USER:-querycraft}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-querycraft}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

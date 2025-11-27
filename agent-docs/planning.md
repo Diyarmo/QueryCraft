@@ -52,4 +52,4 @@
 
 
 ## Dockerization & Ops Tasks
-1. `Todo` – Create an initial `docker-compose.yml` with the Postgres `db` service so other tasks can run against a containerized database.
+1. `Done` – Create an initial `docker-compose.yml` with the Postgres `db` service so other tasks can run against a containerized database.
