@@ -44,7 +44,12 @@
 
 ## Data Layer Tasks
 1. `Done` – Define Django models for `Customer`, `Product`, `Order` with required fields, relationships, and metadata from the design doc.
-2. `Todo` – Generate initial migrations for the data models (`python manage.py makemigrations core`).
-3. `Todo` – Apply migrations to the Postgres database (`python manage.py migrate`).
-4. `Todo` – Implement a read-only SQL execution helper/manager with safety checks (LIMIT enforcement, prohibited keywords).
-5. `Todo` – Build a Faker-powered `seed_db` management command inserting ≥1,000 relational rows across all tables.
+2. `Done` – Generate initial migrations for the data models (`python manage.py makemigrations core`).
+3. `Todo` – Start the Postgres service via Docker Compose to make the database reachable for migrations.
+4. `Todo` – Apply migrations to the Postgres database (`python manage.py migrate`).
+5. `Todo` – Implement a read-only SQL execution helper/manager with safety checks (LIMIT enforcement, prohibited keywords).
+6. `Todo` – Build a Faker-powered `seed_db` management command inserting ≥1,000 relational rows across all tables.
+
+
+## Dockerization & Ops Tasks
+1. `Todo` – Create an initial `docker-compose.yml` with the Postgres `db` service so other tasks can run against a containerized database.
