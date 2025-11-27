@@ -40,3 +40,11 @@
 6. `Done` – Run basic Django health check (`python manage.py check`) to confirm setup.
 7. `Done` – Configure `DATABASES` for Postgres using env-driven credentials (`NAME`, `USER`, `PASSWORD`, `HOST`, `PORT`).
 8. `Done` – Add `.env.example` (and stub `.env`) capturing `SECRET_KEY`, DB values, and Ollama host referenced by settings.
+
+
+## Data Layer Tasks
+1. `Todo` – Define Django models for `Customer`, `Product`, `Order` with required fields, relationships, and metadata from the design doc.
+2. `Todo` – Generate initial migrations for the data models (`python manage.py makemigrations core`).
+3. `Todo` – Apply migrations to the Postgres database (`python manage.py migrate`).
+4. `Todo` – Implement a read-only SQL execution helper/manager with safety checks (LIMIT enforcement, prohibited keywords).
+5. `Todo` – Build a Faker-powered `seed_db` management command inserting ≥1,000 relational rows across all tables.
