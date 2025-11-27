@@ -1,0 +1,40 @@
+## High-Level Plan
+1. **Environment & Tooling** – Virtualenv, dependencies, Git, project structure docs.
+2. **Backend Foundation** – Django project/app scaffolding, settings, database config.
+3. **Data Layer** – Models, migrations, seeding command, Faker data.
+4. **Agent Workflow** – LangGraph integration, Ollama client, SQL validation/execution.
+5. **API & Frontend** – REST endpoint, simple UI, error handling.
+6. **Dockerization & Ops** – Dockerfile, docker-compose, entrypoints, README/info docs.
+7. **Testing & Polish** – Automated tests, linting, final doc updates, repo hygiene.
+
+## Status Legend
+- `Todo` – Next action, no work started.
+- `Backlog` – Known work, not prioritized yet.
+- `Doing` – Currently in progress.
+- `Hold` – Blocked or awaiting input.
+- `Failed` – Attempted but needs replan.
+- `Done` - Action is done.
+
+## Environment & Tooling Tasks
+7. `Done` – Capture task context (`task.md`) and architecture (`design-doc.md`).
+1. `Done` – Choose Python version and confirm availability -> 3.11
+2. `Done` – Create virtual environment.
+3. `Done` – Generate `requirements.txt` with baseline dependencies.
+4. `Done` – Install dependencies inside the virtualenv.
+5. `Done` – Add `.gitignore` for Python/Django/Docker artifacts.
+6. `Done` – Initialize Git repository and connect to remote.
+8. `Done` – Create short `README.md`.
+9. `Backlog` – Configure formatter/linter tooling (Black, Ruff, etc.).
+10. `Backlog` – Set up pre-commit hooks to enforce formatting/linting.
+11. `Done` – Draft `agents.md` outlining agent architecture/usage guidelines.
+12. `Done` – Craft the repo structure in `design-doc.md`.
+13. `Done` – Write initial assumptions in `info.md` and remove them from `design-doc.md`.
+
+
+## Backend Foundation Tasks
+1. `Done` – Scaffold Django project (`django-admin startproject querycraft .`).
+2. `Todo` – Create primary Django app (e.g., `core`) for business logic.
+3. `Todo` – Register app and required third-party apps in `INSTALLED_APPS`.
+4. `Todo` – Configure base settings (time zone, language, static files, DRF defaults).
+5. `Todo` – Add environment variable loading (`python-dotenv`) for secrets and DB config placeholders.
+6. `Todo` – Run basic Django health check (`python manage.py check`) to confirm setup.

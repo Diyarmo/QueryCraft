@@ -49,6 +49,18 @@ Browser ⇄ Django Web (REST API, LangGraph Orchestrator) ⇄ Ollama LLM Service
 6. **Frontend**
    - Minimal HTML/JS page (LLM-generated) that hits the API and displays results/error states.
 
+### 5a. Repository Structure
+```
+/
+├── querycraft/    # Django project settings
+├── core/          # Primary app (models, LangGraph workflow, API, management commands)
+├── frontend/      # Static HTML/JS assets for the UI
+├── scripts/       # Helper or container entrypoint scripts
+├── tests/         # Automated tests
+├── docs/          # Supplemental docs (info.md, diagrams)
+└── root files     # manage.py, requirements.txt, README.md, planning.md, design-doc.md, agents.md, task.md, .env.example, Dockerfile, docker-compose.yml
+```
+
 ### 6. Data Model
 - **customers**: `id (PK)`, `name`, `email (unique)`, `registration_date`.
 - **products**: `id (PK)`, `name`, `category`, `price (Decimal)`.
@@ -107,11 +119,7 @@ Browser ⇄ Django Web (REST API, LangGraph Orchestrator) ⇄ Ollama LLM Service
 9. Document assumptions in `info.md`, finalize README.
 
 ### 13. Assumptions
-- Ollama model file can be auto-downloaded within the container; startup time acceptable for demo.
-- SQL queries remain read-only; no DDL/DML statements required.
-- Seed data (1k+ rows) provides enough coverage for demonstration queries.
-- Single-tenant deployment; authentication/authorization out of scope.
-- LangGraph-based agent can run synchronously per request (no background queue needed).
+See `info.md` for the latest list of implementation assumptions and scope adjustments.
 
 ### 14. Open Questions / Clarifications Needed
 1. Should the agent log or store generated SQL/results for auditing?
