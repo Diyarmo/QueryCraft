@@ -47,9 +47,23 @@
 2. `Done` – Generate initial migrations for the data models (`python manage.py makemigrations core`).
 3. `Done` – Start the Postgres service via Docker Compose to make the database reachable for migrations.
 4. `Done` – Apply migrations to the Postgres database (`python manage.py migrate`).
-5. `Todo` – Implement a read-only SQL execution helper/manager with safety checks (LIMIT enforcement, prohibited keywords).
+5. `Done` – Implement a read-only SQL execution helper/manager with safety checks (LIMIT enforcement, prohibited keywords).
 6. `Done` – Build a Faker-powered `seed_db` management command inserting ≥1,000 relational rows across all tables.
+
+
+## Agent Workflow Tasks
+1. `Todo` – Scaffold the LangGraph workflow structure (graph, nodes, edges) within the Django project.
+2. `Todo` – Implement the QuestionToSQL node that calls the Ollama `sqlcoder` model with schema-aware prompting.
+3. `Todo` – Implement the ValidateSQL node that enforces read-only rules and leverages the SQL helper for safety.
+4. `Todo` – Implement the ExecuteSQL node that runs validated queries via `execute_safe_sql` and captures metadata.
+5. `Todo` – Implement the FormatResponse/Error nodes that normalize outputs (rows, columns, execution time, errors).
+6. `Todo` – Wire the nodes together in a LangGraph entrypoint function ready for the API to call.
 
 
 ## Dockerization & Ops Tasks
 1. `Done` – Create an initial `docker-compose.yml` with the Postgres `db` service so other tasks can run against a containerized database.
+2. `Todo` – Extend `docker-compose.yml` with the `ollama` service (serving sqlcoder).
+3. `Todo` – Add the `web` service definition (build context, env file, command) to docker-compose.
+4. `Todo` – Ensure the Django web container can reach both `db` and `ollama` (network setup, service dependencies).
+5. `Todo` – Wire Django settings/env vars to read the Ollama host/port from `.env` for local and containerized runs.
+6. `Todo` – Document how to start all services (db, ollama, web) via Docker Compose and update README accordingly.

@@ -72,7 +72,7 @@ Browser ⇄ Django Web (REST API, LangGraph Orchestrator) ⇄ Ollama LLM Service
 ### 7. LangGraph Workflow
 1. **Input Node**: Receive `{question, language}` payload.
 2. **QuestionToSQL Node**: Prompt template describing schema/table columns, expected SQL style, result limits.
-3. **ValidateSQL Node**: Lightweight parser ensuring presence of `SELECT`/`FROM`, restricts keywords (`DROP`, `INSERT`, etc.), optional `sqlparse` sanity checks.
+3. **ValidateSQL Node**: Enforces single-statement `SELECT` queries (no multi-command strings), ensures a LIMIT cap, and surfaces descriptive errors before execution; literal occurrences of words like `insert` inside strings are allowed.
 4. **Conditional Edge**:
    - **Valid** → ExecuteSQL Node.
    - **Invalid** → Error Node returning validation message.

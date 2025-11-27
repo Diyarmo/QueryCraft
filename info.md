@@ -10,3 +10,4 @@
 - **Currency scale**: Product prices are stored as whole-number IRR amounts.
 - **Order granularity**: Each `Order` represents a single product purchase (no header/line split) to keep the MVP schema and LangGraph prompts simple; multi-item carts would require introducing `OrderLine` records later if needed.
 - **Agent trust**: The SQL executor still enforces single `SELECT` statements, but we allow harmless literals containing words like “insert” or “delete” under the assumption that LangGraph validation guarantees queries remain read-only.
+- **Model language support**: We only guarantee English questions for now; Persian inputs will be tested for accuracy later, and we’ll insert a translation node if the model struggles.
