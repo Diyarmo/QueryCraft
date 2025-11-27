@@ -32,7 +32,7 @@
 
 
 ## Backend Foundation Tasks
-1. `Done` – Scaffold Django project (`django-admin startproject querycraft .`).
+1. `Todo` – Scaffold Django project (`django-admin startproject querycraft .`).
 2. `Todo` – Create primary Django app (e.g., `core`) for business logic.
 3. `Todo` – Register app and required third-party apps in `INSTALLED_APPS`.
 4. `Todo` – Configure base settings (time zone, language, static files, DRF defaults).
