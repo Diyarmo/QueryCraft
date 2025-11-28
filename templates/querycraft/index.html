@@ -280,7 +280,9 @@
             <div class="form-actions">
                 <button type="submit" id="submit-btn" class="primary">Ask</button>
                 <button type="reset" id="reset-btn" class="secondary">Reset</button>
+                <button type="button" id="seed-btn" class="secondary">Seed Database</button>
             </div>
+            <small class="field-helper">Need fresh demo data? Click “Seed Database” to run the Faker seeding command server-side.</small>
         </form>
 
         <section id="status" class="status hidden" role="status" aria-live="polite"></section>
@@ -323,6 +325,8 @@
         const statusEl = document.getElementById('status');
         const submitBtn = document.getElementById('submit-btn');
         const defaultSubmitLabel = submitBtn.textContent;
+        const seedBtn = document.getElementById('seed-btn');
+        const defaultSeedLabel = seedBtn ? seedBtn.textContent : '';
         const sqlSection = document.getElementById('sql-section');
         const sqlOutput = document.getElementById('sql-output');
         const metaSection = document.getElementById('meta-section');
@@ -369,6 +373,12 @@
         function toggleSubmitting(isSubmitting) {
             submitBtn.disabled = isSubmitting;
             submitBtn.textContent = isSubmitting ? 'Running...' : defaultSubmitLabel;
+        }
+
+        function toggleSeeding(isSeeding) {
+            if (!seedBtn) return;
+            seedBtn.disabled = isSeeding;
+            seedBtn.textContent = isSeeding ? 'Seeding...' : defaultSeedLabel;
         }
 
         function clearResults() {
@@ -519,6 +529,46 @@
             clearStatus();
             clearResults();
         });
+
+        if (seedBtn) {
+            seedBtn.addEventListener('click', async () => {
+                clearStatus();
+                setStatus('Seeding database...', 'info', 'seed');
+                toggleSeeding(true);
+
+                try {
+                    const response = await fetch('/api/seed/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCsrfToken(),
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({ purge: true }),
+                    });
+
+                    let data;
+                    try {
+                        data = await response.json();
+                    } catch (parseError) {
+                        setStatus('Seeding completed, but received an invalid response.', 'error', 'seed');
+                        return;
+                    }
+
+                    if (!response.ok || data.status !== 'ok') {
+                        setStatus(data?.message || 'Seeding failed.', 'error', data?.stage || 'seed');
+                        return;
+                    }
+
+                    setStatus(data.message || 'Database seeded.', 'success', 'seed');
+                } catch (error) {
+                    console.error(error);
+                    setStatus('Unable to seed database.', 'error', 'seed');
+                } finally {
+                    toggleSeeding(false);
+                }
+            });
+        }
     </script>
 </body>
 </html>

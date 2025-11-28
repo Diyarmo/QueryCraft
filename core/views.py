@@ -1,6 +1,9 @@
+import io
 import json
 from typing import Any, Dict
 
+from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
@@ -85,3 +88,48 @@ def query_api(request: HttpRequest) -> JsonResponse:
 
     status_code = 200 if response.get("status") == "ok" else 400
     return JsonResponse(response, status=status_code)
+
+
+@require_POST
+def seed_database_api(request: HttpRequest) -> JsonResponse:
+    """
+    Trigger the Faker-backed seed_db management command via HTTP for demo purposes.
+    """
+
+    try:
+        payload = _parse_request_body(request)
+    except ValueError as exc:
+        return _json_error(str(exc))
+
+    options: Dict[str, Any] = {}
+    purge_value = payload.get("purge")
+    if purge_value is not None:
+        if not isinstance(purge_value, bool):
+            return _json_error("`purge` must be a boolean.")
+        options["purge"] = purge_value
+
+    for key in ("customers", "products", "orders"):
+        if key in payload:
+            try:
+                value = int(payload[key])
+            except (TypeError, ValueError):
+                return _json_error(f"`{key}` must be an integer.")
+            if value <= 0:
+                return _json_error(f"`{key}` must be greater than zero.")
+            options[key] = value
+
+    buffer = io.StringIO()
+    try:
+        call_command("seed_db", stdout=buffer, stderr=buffer, **options)
+    except CommandError as exc:
+        return _json_error(str(exc), stage="seed")
+    except Exception:
+        return _json_error("Internal server error.", status=500, stage="seed")
+
+    message = buffer.getvalue().strip() or "Seeding complete."
+    response = {
+        "status": "ok",
+        "message": message,
+        "stage": "seed",
+    }
+    return JsonResponse(response, status=200)

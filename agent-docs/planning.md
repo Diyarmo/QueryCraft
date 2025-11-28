@@ -88,3 +88,4 @@
 2. `Done` – Add unit tests covering each LangGraph node - ValidateSQL
 3. `Todo` – Add unit tests covering each LangGraph node - ExecuteSQL
 4. `Todo` – Add unit tests covering each SQL executor helper, API endpoint, and seeding utilities.
+5. `Todo` – Wire automated test execution into CI/CD so the suite runs on every push.

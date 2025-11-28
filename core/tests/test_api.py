@@ -1,6 +1,7 @@
 import json
 from unittest.mock import patch
 
+from django.core.management.base import CommandError
 from django.test import TestCase
 from django.urls import reverse
 
@@ -90,3 +91,58 @@ class QueryApiTests(TestCase):
         body = response.json()
         self.assertEqual(body["stage"], "server")
         self.assertEqual(body["status"], "error")
+
+
+class SeedApiTests(TestCase):
+    def _post(self, payload: dict | str):
+        data = payload if isinstance(payload, str) else json.dumps(payload)
+        return self.client.post(
+            reverse("seed-api"),
+            data=data,
+            content_type="application/json",
+        )
+
+    @patch("core.views.call_command")
+    def test_seed_success(self, mock_call_command):
+        response = self._post({})
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["status"], "ok")
+        self.assertEqual(payload["stage"], "seed")
+        mock_call_command.assert_called_once()
+        args, kwargs = mock_call_command.call_args
+        self.assertEqual(args[0], "seed_db")
+        self.assertIn("stdout", kwargs)
+        self.assertIn("stderr", kwargs)
+
+    def test_invalid_purge_flag(self):
+        response = self._post({"purge": "true"})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("`purge` must be a boolean", response.json()["message"])
+
+    def test_invalid_counts(self):
+        response = self._post({"orders": 0})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("greater than zero", response.json()["message"])
+
+    @patch("core.views.call_command", side_effect=CommandError("boom"))
+    def test_command_error(self, mock_call_command):
+        response = self._post({})
+
+        self.assertEqual(response.status_code, 400)
+        payload = response.json()
+        self.assertEqual(payload["stage"], "seed")
+        self.assertEqual(payload["status"], "error")
+        self.assertIn("boom", payload["message"])
+
+    @patch("core.views.call_command", side_effect=Exception("unexpected"))
+    def test_unexpected_error_returns_500(self, mock_call_command):
+        response = self._post({})
+
+        self.assertEqual(response.status_code, 500)
+        payload = response.json()
+        self.assertEqual(payload["stage"], "seed")
+        self.assertEqual(payload["status"], "error")
