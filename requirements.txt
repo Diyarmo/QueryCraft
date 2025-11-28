@@ -6,6 +6,6 @@ langgraph>=0.1.15
 psycopg2-binary>=2.9
 Faker>=25.0
 python-dotenv>=1.0
-sqlparse>=0.5
+sqlparse>=0.5 # Seem not be required
 requests>=2.32
 gunicorn>=22.0
