@@ -54,7 +54,7 @@
 ## Agent Workflow Tasks
 1. `Done` – Scaffold the LangGraph workflow structure (graph, nodes, edges) within the Django project.
 2. `Done` – Implement the QuestionToSQL node that calls the Ollama `sqlcoder` model with schema-aware prompting.
-3. `Todo` – Implement the ValidateSQL node that enforces read-only rules and leverages the SQL helper for safety.
+3. `Done` – Implement the ValidateSQL node that enforces read-only rules and leverages the SQL helper for safety.
 4. `Todo` – Implement the ExecuteSQL node that runs validated queries via `execute_safe_sql` and captures metadata.
 5. `Todo` – Implement the FormatResponse/Error nodes that normalize outputs (rows, columns, execution time, errors).
 6. `Todo` – Wire the nodes together in a LangGraph entrypoint function ready for the API to call.
@@ -72,4 +72,7 @@
 8. `Todo` – Verify `docker-compose up` alone launches `web`, `db`, and `ollama` with working dependencies and document any prerequisites in `README.md`.
 
 ## Testing & Polish Tasks
-1. `Todo` – Add unit tests covering each LangGraph node, SQL executor helper, API endpoint, and seeding utilities.
+1. `Todo` – Add unit tests covering each LangGraph node - QuestionToSQL
+2. `Done` – Add unit tests covering each LangGraph node - ValidateSQL
+3. `Todo` – Add unit tests covering each LangGraph node - ExecuteSQL
+4. `Todo` – Add unit tests covering each SQL executor helper, API endpoint, and seeding utilities.

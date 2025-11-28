@@ -8,6 +8,8 @@ from django.db import connection, transaction
 
 class SQLValidationError(ValueError):
     """Raised when a raw SQL statement fails safety checks."""
+
+
 LIMIT_REGEX = re.compile(r"\blimit\s+(\d+)\b", re.IGNORECASE)
 DEFAULT_MAX_ROWS = 200
 
@@ -49,16 +51,23 @@ def _serialize_value(value: Any) -> Any:
     return value
 
 
+def sanitize_sql(sql: str, max_rows: int = DEFAULT_MAX_ROWS) -> str:
+    """
+    Apply read-only validations and enforce a maximum row count.
+    """
+    if max_rows <= 0:
+        raise ValueError("max_rows must be a positive integer.")
+
+    return _enforce_limit(_ensure_select_statement(sql), max_rows)
+
+
 def execute_safe_sql(
     sql: str, params: Sequence[Any] | None = None, max_rows: int = DEFAULT_MAX_ROWS
 ) -> Dict[str, Any]:
     """
     Validate and execute a read-only SQL query, returning rows plus metadata.
     """
-    if max_rows <= 0:
-        raise ValueError("max_rows must be a positive integer.")
-
-    sanitized = _enforce_limit(_ensure_select_statement(sql), max_rows)
+    sanitized = sanitize_sql(sql, max_rows)
     params = params or None
 
     with transaction.atomic():

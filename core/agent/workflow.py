@@ -10,14 +10,17 @@ from __future__ import annotations
 
 import os
 from functools import lru_cache
-import re
 from typing import Any, Dict, Literal, TypedDict
 
 from langchain_community.chat_models import ChatOllama
 from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.graph import END, StateGraph
 
-from core.services.sql_executor import DEFAULT_MAX_ROWS
+from core.services.sql_executor import (
+    DEFAULT_MAX_ROWS,
+    SQLValidationError,
+    sanitize_sql,
+)
 
 try:  # pragma: no cover - purely for typing compatibility across LangGraph versions.
     from langgraph.graph.graph import CompiledGraph
@@ -42,6 +45,7 @@ class QueryState(TypedDict, total=False):
     execution_ms: float
     metadata: Dict[str, Any]
     stage: str
+    max_rows: int
 
 
 # Preferred ordering for the schema summary so the prompt remains predictable.
@@ -202,8 +206,37 @@ def question_to_sql(state: QueryState) -> QueryState:
 
 
 def validate_sql(state: QueryState) -> QueryState:
-    """Placeholder for running read-only and safety checks on the SQL text."""
-    raise NotImplementedError("ValidateSQL node has not been implemented yet.")
+    """
+    Ensure the generated SQL is a single safe SELECT statement with a reasonable LIMIT.
+    """
+
+    sql = (state.get("sql") or "").strip()
+    if not sql:
+        raise ValueError("SQL text is required for validation.")
+
+    max_rows = state.get("max_rows") or DEFAULT_MAX_ROWS
+    try:
+        max_rows_int = int(max_rows)
+    except (TypeError, ValueError) as exc:  # pragma: no cover - defensive path
+        raise ValueError("max_rows must be an integer.") from exc
+
+    updated_state = dict(state)
+    try:
+        sanitized = sanitize_sql(sql, max_rows_int)
+    except SQLValidationError as exc:
+        updated_state["validation_error"] = str(exc)
+        updated_state["stage"] = "validate_sql"
+        return updated_state
+
+    updated_state["sql"] = sanitized
+    updated_state.pop("validation_error", None)
+    updated_state["stage"] = "validate_sql"
+
+    metadata = dict(updated_state.get("metadata") or {})
+    metadata["max_rows"] = max_rows_int
+    updated_state["metadata"] = metadata
+
+    return updated_state
 
 
 def execute_sql(state: QueryState) -> QueryState:
