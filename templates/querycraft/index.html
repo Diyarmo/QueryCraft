@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QueryCraft</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pico-css@2.0.6/dist/pico.min.css" />
+    <style>
+        body { margin: 2rem; }
+        .results-table { margin-top: 1rem; overflow-x: auto; }
+        textarea { min-height: 120px; }
+        .hidden { display: none; }
+        .status { margin-top: 1rem; font-weight: 500; }
+        .status.info { color: #005577; }
+        .status.success { color: #067a46; }
+        .status.error { color: #b00020; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>QueryCraft</h1>
+        <p>Ask a question about your data and let the agent translate it into SQL.</p>
+        <form id="query-form">
+            {% csrf_token %}
+            <label>
+                Question
+                <textarea id="question" name="question" placeholder="e.g. Show the top 5 products by total orders last month" required></textarea>
+            </label>
+            <label>
+                Language
+                <select id="language" name="language">
+                    <option value="en" selected>English</option>
+                    <option value="fa">Persian</option>
+                </select>
+            </label>
+            <label>
+                Max Rows (optional)
+                <input id="max_rows" name="max_rows" type="number" min="1" placeholder="Default from backend" />
+            </label>
+            <button type="submit" id="submit-btn">Ask</button>
+        </form>
+
+        <section id="status" class="status hidden" role="status" aria-live="polite"></section>
+
+        <section id="sql-section" class="hidden">
+            <h2>Generated SQL</h2>
+            <pre id="sql-output"></pre>
+        </section>
+
+        <section id="results-section" class="hidden">
+            <h2>Results</h2>
+            <div class="results-table">
+                <table id="results-table">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const form = document.getElementById('query-form');
+        const statusEl = document.getElementById('status');
+        const submitBtn = document.getElementById('submit-btn');
+        const sqlSection = document.getElementById('sql-section');
+        const sqlOutput = document.getElementById('sql-output');
+        const resultsSection = document.getElementById('results-section');
+        const resultsTable = document.getElementById('results-table');
+
+        function setStatus(message, type = 'info') {
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            statusEl.classList.remove('hidden');
+        }
+
+        function clearStatus() {
+            statusEl.textContent = '';
+            statusEl.className = 'status hidden';
+        }
+
+        function getCsrfToken() {
+            const match = document.cookie.match(/csrftoken=([^;]+)/);
+            return match ? decodeURIComponent(match[1]) : '';
+        }
+
+        function renderTable(columns, rows) {
+            const thead = resultsTable.querySelector('thead');
+            const tbody = resultsTable.querySelector('tbody');
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            if (!columns || columns.length === 0) {
+                return;
+            }
+
+            const headerRow = document.createElement('tr');
+            columns.forEach(col => {
+                const th = document.createElement('th');
+                th.textContent = col;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                columns.forEach(col => {
+                    const td = document.createElement('td');
+                    td.textContent = row[col] ?? '';
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            clearStatus();
+            sqlSection.classList.add('hidden');
+            resultsSection.classList.add('hidden');
+            submitBtn.disabled = true;
+            setStatus('Running query...', 'info');
+
+            const payload = {
+                question: document.getElementById('question').value,
+                language: document.getElementById('language').value,
+            };
+            const maxRowsValue = document.getElementById('max_rows').value;
+            if (maxRowsValue) {
+                payload.max_rows = Number(maxRowsValue);
+            }
+
+            try {
+                const response = await fetch('/api/query/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken(),
+                    },
+                    body: JSON.stringify(payload),
+                });
+                const data = await response.json();
+
+                if (!response.ok || data.status === 'error') {
+                    setStatus(data.message || 'Request failed.', 'error');
+                    return;
+                }
+
+                setStatus('Query executed successfully.', 'success');
+                if (data.sql) {
+                    sqlOutput.textContent = data.sql;
+                    sqlSection.classList.remove('hidden');
+                }
+                renderTable(data.columns, data.rows);
+                resultsSection.classList.remove('hidden');
+            } catch (error) {
+                console.error(error);
+                setStatus('An unexpected error occurred.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

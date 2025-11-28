@@ -17,8 +17,8 @@ import django  # noqa: E402
 
 django.setup()
 
+from core.services.sql_executor import execute_safe_sql  # noqa: E402
 from core.agent.workflow import question_to_sql  # noqa: E402
-
 
 def test_question_to_sql_simple_select() -> None:
     state = {
@@ -38,6 +38,11 @@ def test_question_to_sql_simple_join() -> None:
     print("Generated SQL:\n", result["sql"])
 
 
+def test_execute_sql_query():
+    print(execute_safe_sql("""select * from core_product"""))
+
+
 if __name__ == "__main__":
-    test_question_to_sql_simple_select()
+    # test_question_to_sql_simple_select()
     # test_question_to_sql_simple_join()
+    test_execute_sql_query()

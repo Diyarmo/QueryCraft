@@ -2,7 +2,8 @@ import json
 from typing import Any, Dict
 
 from django.http import HttpRequest, JsonResponse
-from django.views.decorators.http import require_POST
+from django.shortcuts import render
+from django.views.decorators.http import require_GET, require_POST
 
 from core.agent import run_query_agent
 
@@ -22,6 +23,15 @@ def _parse_request_body(request: HttpRequest) -> Dict[str, Any]:
     if not isinstance(data, dict):
         raise ValueError("JSON payload must be an object.")
     return data
+
+
+@require_GET
+def query_page(request: HttpRequest):
+    """
+    Render the minimal UI that interacts with the query API.
+    """
+
+    return render(request, "querycraft/index.html")
 
 
 @require_POST

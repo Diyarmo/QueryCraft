@@ -20,7 +20,7 @@ def _ensure_select_statement(sql: str) -> str:
 
     cleaned = sql.strip().rstrip(";")
     lowered = cleaned.lower()
-
+    print(f"lowered: `{lowered}`", )
     if not lowered.startswith("select"):
         raise SQLValidationError("Only SELECT statements are permitted.")
 

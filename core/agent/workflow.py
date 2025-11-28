@@ -55,28 +55,52 @@ class QueryState(TypedDict, total=False):
 
 # Preferred ordering for the schema summary so the prompt remains predictable.
 SCHEMA_REFERENCE = """
-customers (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR NOT NULL,
-    email VARCHAR UNIQUE NOT NULL,
+-- ==============================
+-- Table: core_customer
+-- ==============================
+CREATE TABLE core_customer (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(254) NOT NULL UNIQUE,
     registration_date TIMESTAMPTZ NOT NULL
-)
+);
 
-products (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR NOT NULL,
-    category VARCHAR NOT NULL,
-    price BIGINT NOT NULL -- stored in IRR
-)
 
-orders (
-    id SERIAL PRIMARY KEY,
-    customer_id INTEGER NOT NULL REFERENCES customers(id),
-    product_id INTEGER NOT NULL REFERENCES products(id),
+-- ==============================
+-- Table: core_product
+-- ==============================
+CREATE TABLE core_product (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(120) NOT NULL,
+    price BIGINT NOT NULL
+);
+
+
+-- ==============================
+-- Table: core_order
+-- ==============================
+CREATE TABLE core_order (
+    id BIGSERIAL PRIMARY KEY,
     order_date TIMESTAMPTZ NOT NULL,
-    quantity INTEGER NOT NULL,
-    status VARCHAR NOT NULL CHECK (status IN ('pending','completed','cancelled','refunded'))
-)
+    quantity INTEGER NOT NULL CHECK (quantity >= 0),
+    status VARCHAR(20) NOT NULL,
+    customer_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+
+    CONSTRAINT core_order_status_check
+        CHECK (status IN ('pending', 'completed', 'cancelled', 'refunded')),
+
+    CONSTRAINT core_order_customer_id_fk
+        FOREIGN KEY (customer_id)
+        REFERENCES core_customer(id)
+        ON DELETE PROTECT,
+
+    CONSTRAINT core_order_product_id_fk
+        FOREIGN KEY (product_id)
+        REFERENCES core_product(id)
+        ON DELETE PROTECT
+);
 
 """
 
@@ -95,12 +119,10 @@ The query will run on a database whose schema is represented by the following ta
 {SCHEMA_REFERENCE}
 """
 
-USER_PROMPT_TEMPLATE = """### Question
-Here is the question: `{question}`.
-
-### Answer
-Strictly following the given the database schema and instructions,
-here is the SQL query without anyother extra words that answers the question and NO OTHER TEXT AFTER THAT.
+USER_PROMPT_TEMPLATE = """### Answer
+Strictly following the given table schemas and correct table names,
+here is the SQL query without anyother extra words that answers the question below and NO OTHER TEXT AFTER THAT.
+question: `{question}`
 
 ```sql
 """
@@ -157,16 +179,22 @@ def _message_to_text(response: Any) -> str:
 
 
 def _strip_sql_code_fences(value: str) -> str:
-    # Models often wrap SQL in ``` (sometimes ```sql), so peel those wrappers off.
+    # Models often wrap SQL in ``` (sometimes ```sql) or add huggingface tokens like <s> </s>.
     cleaned = value.strip()
 
-    if not cleaned.startswith("```"):
-        return cleaned
+    for token in ("<s>", "</s>"):
+        if cleaned.startswith(token):
+            cleaned = cleaned[len(token):].lstrip()
+        if cleaned.endswith(token):
+            cleaned = cleaned[: -len(token)].rstrip()
 
-    cleaned = cleaned.lstrip("`")
-    if cleaned.lower().startswith("sql"):
-        cleaned = cleaned[3:]
-    cleaned = cleaned.lstrip("\n")
+    if cleaned.startswith("```"):
+        cleaned = cleaned.lstrip("`")
+        if cleaned.lower().startswith("sql"):
+            cleaned = cleaned[3:]
+        cleaned = cleaned.lstrip("\n")
+
+    cleaned = cleaned.rstrip("\n")
     if cleaned.endswith("```"):
         cleaned = cleaned[:-3]
     return cleaned.strip()
@@ -206,7 +234,7 @@ def question_to_sql(state: QueryState) -> QueryState:
     metadata["llm_model"] = _get_ollama_model()
     metadata["ollama_base_url"] = _get_ollama_base_url()
     updated_state["metadata"] = metadata
-
+    print("SQL:", sql)
     return updated_state
 
 

@@ -16,13 +16,13 @@
 - `Done` - Action is done.
 
 ## Environment & Tooling Tasks
-7. `Done` – Capture task context (`task.md`) and architecture (`design-doc.md`).
 1. `Done` – Choose Python version and confirm availability -> 3.11
 2. `Done` – Create virtual environment.
 3. `Done` – Generate `requirements.txt` with baseline dependencies.
 4. `Done` – Install dependencies inside the virtualenv.
 5. `Done` – Add `.gitignore` for Python/Django/Docker artifacts.
 6. `Done` – Initialize Git repository and connect to remote.
+7. `Done` – Capture task context (`task.md`) and architecture (`design-doc.md`).
 8. `Done` – Create short `README.md`.
 9. `Backlog` – Configure formatter/linter tooling (Black, Ruff, etc.).
 10. `Backlog` – Set up pre-commit hooks to enforce formatting/linting.
@@ -61,11 +61,12 @@
 7. `Todo` – Run a final cleanup pass on `core/agent/workflow.py` once all nodes are implemented (comments, docstrings, prompt constants).
 8. `Done` – Route execution-time failures through the error path so database issues still return structured responses.
 9. `Todo` – Add a retry mechanism around SQL execution to handle transient database errors before surfacing failures.
+10. `Todo` – Refine the `sqlcoder` prompt so it reliably uses the exact table and column names provided in the schema context.
 
 ## API & Frontend Tasks
 1. `Done` – Implement a `/api/query/` endpoint that invokes `run_query_agent` and returns normalized responses.
 2. `Done` – Add request validation/error handling (required fields, language defaults, structured errors).
-3. `Todo` – Build a minimal HTML/JS frontend that submits questions and renders table results/errors.
+3. `Doing` – Build a minimal HTML/JS frontend that submits questions and renders table results/errors.
 4. `Todo` – Add UX polish (loading states, empty states, basic styling) for demo readiness.
 5. `Todo` – Document API usage and frontend flow in `README.md`.
 
