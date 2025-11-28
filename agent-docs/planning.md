@@ -68,7 +68,7 @@
 2. `Done` – Add request validation/error handling (required fields, language defaults, structured errors).
 3. `Done` – Build a minimal HTML/JS frontend that submits questions and renders table results/errors.
 4. `Done` – Add UX polish (loading states, empty states, basic styling) for demo readiness.
-5. `Todo` – Document API usage and frontend flow in `README.md`.
+5. `Done` – Document API usage and frontend flow in `README.md`.
 
 
 ## Dockerization & Ops Tasks
@@ -77,7 +77,7 @@
 3. `Done` – Add the `web` service definition (build context, env file, command) to docker-compose.
 4. `Done` – Ensure the Django web container can reach both `db` and `ollama` (network setup, service dependencies).
 5. `Done` – Wire Django settings/env vars to read the Ollama host/port from `.env` for local and containerized runs.
-6. `Todo` – Document how to start all services (db, ollama, web) via Docker Compose and update README accordingly.
+6. `Done` – Document how to start all services (db, ollama, web) via Docker Compose and update README accordingly.
 7. `Done` – Update the Ollama entrypoint script so it can pull the SQLCoder model without relying on missing tools in the base image.
 8. `Todo` – Verify `docker-compose up` alone launches `web`, `db`, and `ollama` with working dependencies and document any prerequisites in `README.md`.
 9. `Done` – Create a Dockerfile for the Django web service that installs dependencies and runs the app.
