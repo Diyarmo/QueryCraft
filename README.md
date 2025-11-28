@@ -16,7 +16,7 @@ Prereqs: Docker (24+) with the Compose plugin and ~8 GB of disk for the sqlcod
    ```
    - The first start downloads the `sqlcoder:7b-q4_K_M` model inside the `ollama` container, so expect several minutes of logs before it reports ready.
    - The `web` container runs Django’s dev server on `http://localhost:8000`; Postgres is available on `localhost:5432`.
-3. In another terminal, run initial migrations and seed data if desired:
+3. In another terminal, run initial migrations and seed data if desired. You can use **Seed Database** button in UI for this purpose too!
    ```bash
    docker compose exec web python manage.py seed_db
    ```
@@ -73,3 +73,19 @@ Validation or execution issues return structured errors so clients can branch on
 ```
 
 Errors originating deeper in the workflow set `stage` to `validate_sql`, `execute_sql`, or `server` to simplify troubleshooting.
+
+
+## Coder Model Considerations
+
+* The `sqlcoder:7b-q4_K_M` model has some trouble in using correct table name and schemas. Tweak your question to get the result!
+* The `sqlcoder:7b-q4_K_M` is not primarly a multilingual model and has lower performance in Persian!
+* These questions have been tested:
+```
+1. What are the products in `core_product` table?
+2. What is `name` and `email` of customers in `core_customer` table?
+3. نام محصولات در جدول `core_product` را نمایش بده
+```
+
+
+
+  

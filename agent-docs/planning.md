@@ -69,6 +69,7 @@
 3. `Done` – Build a minimal HTML/JS frontend that submits questions and renders table results/errors.
 4. `Done` – Add UX polish (loading states, empty states, basic styling) for demo readiness.
 5. `Done` – Document API usage and frontend flow in `README.md`.
+6. `Done` – Add a frontend button that triggers database seeding via a backend endpoint.
 
 
 ## Dockerization & Ops Tasks
