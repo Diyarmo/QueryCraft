@@ -63,7 +63,7 @@
 9. `Todo` – Add a retry mechanism around SQL execution to handle transient database errors before surfacing failures.
 
 ## API & Frontend Tasks
-1. `Todo` – Implement a `/api/query/` endpoint that invokes `run_query_agent` and returns normalized responses.
+1. `Done` – Implement a `/api/query/` endpoint that invokes `run_query_agent` and returns normalized responses.
 2. `Todo` – Add request validation/error handling (required fields, language defaults, structured errors).
 3. `Todo` – Build a minimal HTML/JS frontend that submits questions and renders table results/errors.
 4. `Todo` – Add UX polish (loading states, empty states, basic styling) for demo readiness.
