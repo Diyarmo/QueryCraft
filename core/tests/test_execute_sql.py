@@ -32,3 +32,13 @@ class ExecuteSQLNodeTests(SimpleTestCase):
     def test_execute_sql_requires_sql(self) -> None:
         with self.assertRaises(ValueError):
             execute_sql({})
+
+    @patch("core.agent.workflow.execute_safe_sql", side_effect=RuntimeError("db down"))
+    def test_execute_sql_captures_errors(self, mock_execute_safe_sql) -> None:
+        state = {"sql": "SELECT 1"}
+
+        result = execute_sql(state)
+
+        self.assertEqual(result["error_message"], "db down")
+        self.assertEqual(result["error_stage"], "execute_sql")
+        self.assertEqual(result["stage"], "execute_sql")

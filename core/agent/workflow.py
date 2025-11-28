@@ -254,11 +254,18 @@ def execute_sql(state: QueryState) -> QueryState:
         raise ValueError("SQL text is required for execution.")
 
     max_rows = state.get("max_rows") or DEFAULT_MAX_ROWS
-    start = perf_counter()
-    result = execute_safe_sql(sql, max_rows=max_rows)
-    elapsed_ms = (perf_counter() - start) * 1000
-
     updated_state = dict(state)
+
+    try:
+        start = perf_counter()
+        result = execute_safe_sql(sql, max_rows=max_rows)
+        elapsed_ms = (perf_counter() - start) * 1000
+    except Exception as exc:  # pragma: no cover - DB-level errors surfaced to user.
+        updated_state["error_message"] = str(exc)
+        updated_state["error_stage"] = "execute_sql"
+        updated_state["stage"] = "execute_sql"
+        return updated_state
+
     updated_state["sql"] = result.get("sql", sql)
     updated_state["columns"] = result.get("columns", [])
     updated_state["rows"] = result.get("rows", [])
@@ -270,6 +277,8 @@ def execute_sql(state: QueryState) -> QueryState:
     metadata["row_count"] = len(updated_state["rows"])
     metadata["execution_ms"] = elapsed_ms
     updated_state["metadata"] = metadata
+    updated_state.pop("error_message", None)
+    updated_state.pop("error_stage", None)
 
     return updated_state
 
@@ -327,6 +336,11 @@ def _route_validation(state: QueryState) -> Literal["valid", "invalid"]:
     return "invalid" if state.get("validation_error") else "valid"
 
 
+def _route_execution(state: QueryState) -> Literal["success", "error"]:
+    """Conditional edge helper that routes based on execution errors."""
+    return "error" if state.get("error_message") else "success"
+
+
 def _build_graph() -> CompiledGraph:
     graph = StateGraph(QueryState)
 
@@ -347,7 +361,14 @@ def _build_graph() -> CompiledGraph:
             "invalid": "error",
         },
     )
-    graph.add_edge("execute_sql", "format_response")
+    graph.add_conditional_edges(
+        "execute_sql",
+        _route_execution,
+        {
+            "success": "format_response",
+            "error": "error",
+        },
+    )
     graph.add_edge("error", "format_response")
     graph.add_edge("format_response", END)
 
