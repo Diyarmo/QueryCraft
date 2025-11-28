@@ -41,13 +41,52 @@ class QueryApiTests(TestCase):
         self.assertEqual(response.json()["stage"], "execute_sql")
 
     def test_missing_question_returns_400(self):
-        response = self._post({"question": ""})
+        response = self._post({})
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["message"], "`question` is required.")
+
+    def test_blank_question_returns_400(self):
+        response = self._post({"question": "   "})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["message"], "`question` is required.")
+
+    def test_non_string_question_returns_400(self):
+        response = self._post({"question": 123})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("must be a string", response.json()["message"])
+
+    def test_non_string_language_returns_400(self):
+        response = self._post({"question": "hi", "language": 42})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("`language` must be a string", response.json()["message"])
+
+    def test_language_too_long(self):
+        response = self._post({"question": "hi", "language": "x" * 20})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("language", response.json()["message"])
 
     def test_invalid_json_returns_400(self):
         response = self._post("{invalid json")
 
         self.assertEqual(response.status_code, 400)
         self.assertIn("Invalid JSON", response.json()["message"])
+
+    def test_json_must_be_object(self):
+        response = self._post("[]")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("must be an object", response.json()["message"])
+
+    @patch("core.views.run_query_agent", side_effect=Exception("boom"))
+    def test_unexpected_server_error_returns_500(self, mock_run_query_agent):
+        response = self._post({"question": "boom"})
+
+        self.assertEqual(response.status_code, 500)
+        body = response.json()
+        self.assertEqual(body["stage"], "server")
+        self.assertEqual(body["status"], "error")

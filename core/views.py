@@ -16,9 +16,12 @@ def _parse_request_body(request: HttpRequest) -> Dict[str, Any]:
     if not request.body:
         return {}
     try:
-        return json.loads(request.body.decode("utf-8"))
+        data = json.loads(request.body.decode("utf-8"))
     except json.JSONDecodeError as exc:
         raise ValueError("Invalid JSON payload.") from exc
+    if not isinstance(data, dict):
+        raise ValueError("JSON payload must be an object.")
+    return data
 
 
 @require_POST
@@ -32,12 +35,22 @@ def query_api(request: HttpRequest) -> JsonResponse:
     except ValueError as exc:
         return _json_error(str(exc))
 
-    question = (payload.get("question") or "").strip()
-    language = (payload.get("language") or "en").strip() or "en"
-    max_rows_value = payload.get("max_rows")
-
+    question_raw = payload.get("question")
+    if question_raw is None:
+        return _json_error("`question` is required.")
+    if not isinstance(question_raw, str):
+        return _json_error("`question` must be a string.")
+    question = question_raw.strip()
     if not question:
         return _json_error("`question` is required.")
+
+    language_raw = payload.get("language", "en")
+    if not isinstance(language_raw, str):
+        return _json_error("`language` must be a string.")
+    language = (language_raw or "en").strip() or "en"
+    if len(language) > 10:  # guard against unreasonable values passed downstream
+        return _json_error("`language` value is too long.")
+    max_rows_value = payload.get("max_rows")
 
     max_rows: int | None = None
     if max_rows_value is not None:
@@ -49,16 +62,11 @@ def query_api(request: HttpRequest) -> JsonResponse:
             return _json_error("`max_rows` must be greater than zero.")
         max_rows = max_rows_int
 
-    metadata = payload.get("metadata")
-    if metadata is not None and not isinstance(metadata, dict):
-        return _json_error("`metadata` must be an object if provided.")
-
     try:
         response = run_query_agent(
             question,
             language=language,
             max_rows=max_rows,
-            metadata=metadata,
         )
     except ValueError as exc:
         return _json_error(str(exc))
@@ -67,4 +75,3 @@ def query_api(request: HttpRequest) -> JsonResponse:
 
     status_code = 200 if response.get("status") == "ok" else 400
     return JsonResponse(response, status=status_code)
-

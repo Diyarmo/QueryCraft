@@ -392,7 +392,6 @@ def run_query_agent(
     *,
     language: str = "en",
     max_rows: int | None = None,
-    metadata: Dict[str, Any] | None = None,
 ) -> Dict[str, Any]:
     """
     Public entrypoint for executing the LangGraph workflow end-to-end.
@@ -410,9 +409,6 @@ def run_query_agent(
     }
     if max_rows is not None:
         initial_state["max_rows"] = max_rows
-    if metadata:
-        initial_state["metadata"] = metadata
-
     agent = get_query_agent()
     result_state = agent.invoke(initial_state)
 

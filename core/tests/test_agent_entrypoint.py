@@ -32,14 +32,12 @@ class RunQueryAgentTests(SimpleTestCase):
             "List customers",
             language="fa",
             max_rows=25,
-            metadata={"foo": "bar"},
         )
 
         self.assertEqual(response["status"], "ok")
         self.assertEqual(dummy.state["question"], "List customers")
         self.assertEqual(dummy.state["language"], "fa")
         self.assertEqual(dummy.state["max_rows"], 25)
-        self.assertEqual(dummy.state["metadata"], {"foo": "bar"})
 
     @patch("core.agent.workflow.get_query_agent")
     def test_missing_response_falls_back_to_simple_payload(self, mock_get_agent) -> None:
