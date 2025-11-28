@@ -13,6 +13,7 @@ from functools import lru_cache
 from time import perf_counter
 from typing import Any, Dict, Literal, TypedDict
 
+from django.conf import settings
 from langchain_community.chat_models import ChatOllama
 from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.graph import END, StateGraph
@@ -128,13 +129,12 @@ question: `{question}`
 """
 
 
-
 def _get_ollama_base_url() -> str:
-    return os.environ.get("OLLAMA_HOST") or os.environ.get("OLLAMA_BASE_URL") or "http://localhost:11434"
+    return getattr(settings, "OLLAMA_HOST", None) or os.environ.get("OLLAMA_HOST") or os.environ.get("OLLAMA_BASE_URL") or "http://localhost:11434"
 
 
 def _get_ollama_model() -> str:
-    return os.environ.get("OLLAMA_MODEL", "sqlcoder:7b-q4_K_M")
+    return getattr(settings, "OLLAMA_MODEL", None) or os.environ.get("OLLAMA_MODEL") or "sqlcoder:7b-q4_K_M"
 
 
 def _get_sqlcoder_client() -> ChatOllama:

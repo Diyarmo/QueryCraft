@@ -41,6 +41,10 @@ POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'querycraft')
 POSTGRES_HOST = os.environ.get('POSTGRES_HOST', 'localhost')
 POSTGRES_PORT = os.environ.get('POSTGRES_PORT', '5432')
 
+OLLAMA_HOST = os.environ.get('OLLAMA_HOST', 'http://localhost:11434')
+OLLAMA_PORT = os.environ.get('OLLAMA_PORT', '11434')
+OLLAMA_MODEL = os.environ.get('OLLAMA_MODEL', 'sqlcoder:7b-q4_K_M')
+
 
 # Application definition
 

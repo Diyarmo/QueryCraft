@@ -75,8 +75,8 @@
 1. `Done` – Create an initial `docker-compose.yml` with the Postgres `db` service so other tasks can run against a containerized database.
 2. `Done` – Extend `docker-compose.yml` with the `ollama` service (serving sqlcoder).
 3. `Done` – Add the `web` service definition (build context, env file, command) to docker-compose.
-4. `Todo` – Ensure the Django web container can reach both `db` and `ollama` (network setup, service dependencies).
-5. `Todo` – Wire Django settings/env vars to read the Ollama host/port from `.env` for local and containerized runs.
+4. `Done` – Ensure the Django web container can reach both `db` and `ollama` (network setup, service dependencies).
+5. `Done` – Wire Django settings/env vars to read the Ollama host/port from `.env` for local and containerized runs.
 6. `Todo` – Document how to start all services (db, ollama, web) via Docker Compose and update README accordingly.
 7. `Done` – Update the Ollama entrypoint script so it can pull the SQLCoder model without relying on missing tools in the base image.
 8. `Todo` – Verify `docker-compose up` alone launches `web`, `db`, and `ollama` with working dependencies and document any prerequisites in `README.md`.
