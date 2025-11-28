@@ -364,3 +364,47 @@ def get_query_agent() -> CompiledGraph:
     """
 
     return _build_graph()
+
+
+def run_query_agent(
+    question: str,
+    *,
+    language: str = "en",
+    max_rows: int | None = None,
+    metadata: Dict[str, Any] | None = None,
+) -> Dict[str, Any]:
+    """
+    Public entrypoint for executing the LangGraph workflow end-to-end.
+    """
+
+    question_text = (question or "").strip()
+    if not question_text:
+        raise ValueError("Question text is required.")
+
+    language_value = (language or "en").strip() or "en"
+
+    initial_state: QueryState = {
+        "question": question_text,
+        "language": language_value,
+    }
+    if max_rows is not None:
+        initial_state["max_rows"] = max_rows
+    if metadata:
+        initial_state["metadata"] = metadata
+
+    agent = get_query_agent()
+    result_state = agent.invoke(initial_state)
+
+    response = result_state.get("response")
+    if isinstance(response, dict):
+        return response
+
+    # Fallback in case the graph did not produce a normalized response.
+    return {
+        "status": "ok" if not result_state.get("validation_error") else "error",
+        "sql": result_state.get("sql"),
+        "columns": result_state.get("columns") or [],
+        "rows": result_state.get("rows") or [],
+        "execution_ms": result_state.get("execution_ms"),
+        "metadata": result_state.get("metadata"),
+    }

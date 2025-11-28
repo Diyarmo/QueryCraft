@@ -57,7 +57,7 @@
 3. `Done` – Implement the ValidateSQL node that enforces read-only rules and leverages the SQL helper for safety.
 4. `Done` – Implement the ExecuteSQL node that runs validated queries via `execute_safe_sql` and captures metadata.
 5. `Done` – Implement the FormatResponse/Error nodes that normalize outputs (rows, columns, execution time, errors).
-6. `Todo` – Wire the nodes together in a LangGraph entrypoint function ready for the API to call.
+6. `Done` – Wire the nodes together in a LangGraph entrypoint function ready for the API to call.
 7. `Todo` – Run a final cleanup pass on `core/agent/workflow.py` once all nodes are implemented (comments, docstrings, prompt constants).
 8. `Todo` – Route execution-time failures through the error path so database issues still return structured responses.
 9. `Todo` – Add a retry mechanism around SQL execution to handle transient database errors before surfacing failures.
