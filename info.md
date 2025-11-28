@@ -4,7 +4,7 @@
 - **Seed data volume**: Generating ≥1,000 Faker-driven rows across customers, products, and orders is sufficient to showcase realistic queries.
 - **Single-tenant demo**: Authentication/authorization is not required for this MVP; assume all users share the same access.
 - **Synchronous agent**: LangGraph workflow executes synchronously per request; no background queue or async worker is planned.
-- **Local deployment**: Primary target is local docker-compose usage; production hardening (observability, autoscaling) is deferred unless noted otherwise.
+- **Local deployment**: Primary target is local docker-compose usage; production hardening (observability, autoscaling) is deferred.
 - **Order status values**: `order.status` is constrained to `pending`, `completed`, `cancelled`, or `refunded` to keep reporting consistent.
 - **Customer signup queries**: Time-bound signup analytics are common, so `customers.registration_date` and `orders.order_date` are indexed for fast aggregates.
 - **Currency scale**: Product prices are stored as whole-number IRR amounts.
