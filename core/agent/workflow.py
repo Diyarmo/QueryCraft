@@ -221,7 +221,6 @@ def question_to_sql(state: QueryState) -> QueryState:
             )
         ),
     ]
-    # response = llm.invoke("hi")
     response = llm.invoke(messages)
     sql = _strip_sql_code_fences(_message_to_text(response))
     if not sql:
