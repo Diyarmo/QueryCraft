@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import os
 from functools import lru_cache
+from time import perf_counter
 from typing import Any, Dict, Literal, TypedDict
 
 from langchain_community.chat_models import ChatOllama
@@ -19,6 +20,7 @@ from langgraph.graph import END, StateGraph
 from core.services.sql_executor import (
     DEFAULT_MAX_ROWS,
     SQLValidationError,
+    execute_safe_sql,
     sanitize_sql,
 )
 
@@ -240,8 +242,33 @@ def validate_sql(state: QueryState) -> QueryState:
 
 
 def execute_sql(state: QueryState) -> QueryState:
-    """Placeholder for executing validated SQL against Postgres."""
-    raise NotImplementedError("ExecuteSQL node has not been implemented yet.")
+    """
+    Execute the sanitized SQL against Postgres and capture result metadata.
+    """
+
+    sql = (state.get("sql") or "").strip()
+    if not sql:
+        raise ValueError("SQL text is required for execution.")
+
+    max_rows = state.get("max_rows") or DEFAULT_MAX_ROWS
+    start = perf_counter()
+    result = execute_safe_sql(sql, max_rows=max_rows)
+    elapsed_ms = (perf_counter() - start) * 1000
+
+    updated_state = dict(state)
+    updated_state["sql"] = result.get("sql", sql)
+    updated_state["columns"] = result.get("columns", [])
+    updated_state["rows"] = result.get("rows", [])
+    updated_state["execution_ms"] = elapsed_ms
+    updated_state["stage"] = "execute_sql"
+
+    metadata = dict(updated_state.get("metadata") or {})
+    metadata.setdefault("max_rows", max_rows)
+    metadata["row_count"] = len(updated_state["rows"])
+    metadata["execution_ms"] = elapsed_ms
+    updated_state["metadata"] = metadata
+
+    return updated_state
 
 
 def format_response(state: QueryState) -> QueryState:
