@@ -48,6 +48,9 @@ class QueryState(TypedDict, total=False):
     metadata: Dict[str, Any]
     stage: str
     max_rows: int
+    error_message: str
+    error_stage: str
+    response: Dict[str, Any]
 
 
 # Preferred ordering for the schema summary so the prompt remains predictable.
@@ -272,15 +275,51 @@ def execute_sql(state: QueryState) -> QueryState:
 
 
 def format_response(state: QueryState) -> QueryState:
-    """Placeholder node that should normalize success/error payloads."""
-    raise NotImplementedError("FormatResponse node has not been implemented yet.")
+    """
+    Normalize the workflow output into a consistent payload for downstream consumers.
+    """
+
+    updated_state = dict(state)
+    metadata = dict(updated_state.get("metadata") or {})
+    error_message = updated_state.get("error_message") or updated_state.get("validation_error")
+    is_error = bool(error_message) or updated_state.get("stage") == "error"
+
+    if is_error:
+        response = {
+            "status": "error",
+            "message": error_message or "An unknown error occurred.",
+            "stage": updated_state.get("error_stage") or updated_state.get("stage") or "unknown",
+        }
+        if metadata:
+            response["metadata"] = metadata
+    else:
+        response = {
+            "status": "ok",
+            "sql": updated_state.get("sql"),
+            "columns": updated_state.get("columns") or [],
+            "rows": updated_state.get("rows") or [],
+            "execution_ms": updated_state.get("execution_ms"),
+        }
+        if metadata:
+            response["metadata"] = metadata
+
+    updated_state["response"] = response
+    updated_state["stage"] = "format_response"
+    return updated_state
 
 
 def handle_error(state: QueryState) -> QueryState:
     """
-    Placeholder error handler that will format validation issues in later steps.
+    Capture validation/execution issues and prepare the state for the format node.
     """
-    raise NotImplementedError("Error handler node has not been implemented yet.")
+
+    failure_stage = state.get("stage") or "unknown"
+    message = state.get("validation_error") or state.get("error_message") or "An unknown error occurred."
+    updated_state = dict(state)
+    updated_state["error_message"] = message
+    updated_state["error_stage"] = failure_stage
+    updated_state["stage"] = "error"
+    return updated_state
 
 
 def _route_validation(state: QueryState) -> Literal["valid", "invalid"]:
