@@ -89,3 +89,4 @@
 3. `Todo` – Add unit tests covering each LangGraph node - ExecuteSQL
 4. `Todo` – Add unit tests covering each SQL executor helper, API endpoint, and seeding utilities.
 5. `Todo` – Wire automated test execution into CI/CD so the suite runs on every push.
+6. `Done` – Expand README with agent-docs references and summarize the project orchestration flow.

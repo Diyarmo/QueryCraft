@@ -3,6 +3,12 @@
 QueryCraft lets non-technical teammates ask business questions in Persian or English, auto-convert them to safe SQL via an Ollama-powered LangGraph agent, and return results from PostgreSQL through a small Django web app.
 
 
+## Documentation
+- `agent-docs/task.md` – challenge brief and acceptance criteria.
+- `agent-docs/design-doc.md` – architecture, LangGraph plan, schema notes.
+- `agent-docs/planning.md` – single source of truth for tasks/status.
+- `info.md` – running list of assumptions or scope tweaks.
+
 ## Run with Docker Compose
 Prereqs: Docker (24+) with the Compose plugin and ~8 GB of disk for the sqlcoder model + Postgres volume.
 
