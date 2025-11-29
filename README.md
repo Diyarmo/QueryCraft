@@ -22,11 +22,15 @@ Prereqs: Docker (24+) with the Compose plugin and ~8 GB of disk for the sqlcod
    ```
    - The first start downloads the `sqlcoder:7b-q4_K_M` model inside the `ollama` container, so expect several minutes of logs before it reports ready.
    - The `web` container runs Django’s dev server on `http://localhost:8000`; Postgres is available on `localhost:5432`.
-3. In another terminal, run initial migrations and seed data if desired. You can use **Seed Database** button in UI for this purpose too!
+3. In another terminal, apply migrations:
+   ```bash
+   docker compose exec web python manage.py migrate
+   ```
+4. (Optional) Seed the database with Faker data or click **Seed Database** in the UI:
    ```bash
    docker compose exec web python manage.py seed_db
    ```
-4. Visit `http://localhost:8000/` to load the UI, or call the API directly once the logs show the web service listening.
+5. Visit `http://localhost:8000/` to load the UI, or call the API directly once the logs show the web service listening.
 
 To stop and clean up containers, press `Ctrl+C` in the Compose terminal; use `docker compose down -v` if you want to delete the Postgres/Ollama volumes.
 
